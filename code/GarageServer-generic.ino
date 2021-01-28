@@ -14,19 +14,22 @@ const char* password = "yourpasswordhere";
 ESP8266WebServer server(80);
 
 #define relayPin 5
+#define relayPin2 4
+#define lightPin 3
+#define alarmPin 12
 
 const char *webpage =
 #include "webPage.h"
 ;
 
 void handleRoot() {
-  //digitalWrite(LED_BUILTIN, 1);
+  //digitalWrite(lightPin, 1);
   server.send(200, "text/html", webpage);
-  //digitalWrite(LED_BUILTIN, 0);
+  //digitalWrite(lightPin, 0);
 }
 
 void handleNotFound() {
-  digitalWrite(LED_BUILTIN, 1);
+  digitalWrite(lightPin, 1);
   String message = "File Not Found\n\n";
   message += "URI: ";
   message += server.uri();
@@ -39,14 +42,18 @@ void handleNotFound() {
     message += " " + server.argName(i) + ": " + server.arg(i) + "\n";
   }
   server.send(404, "text/plain", message);
-  digitalWrite(BUILTIN_LED, 0);
+  digitalWrite(lightPin, 0);
 }
 
 void setup(void) {
-  pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(lightPin, OUTPUT);
   pinMode(relayPin, OUTPUT);
-  digitalWrite(LED_BUILTIN, HIGH);
-  digitalWrite(relayPin, LOW);
+  pinMode(relayPin2, OUTPUT);
+  pinMode(alarmPin, OUTPUT);
+  digitalWrite(lightPin, LOW);
+  digitalWrite(relayPin, HIGH);
+  digitalWrite(relayPin2, HIGH);
+  digitalWrite(alarmPin, LOW);
   Serial.begin(115200);
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
@@ -69,21 +76,77 @@ void setup(void) {
 
   server.on("/", handleRoot);
 
-   server.on("/door", []() {
-    digitalWrite(relayPin, HIGH);
-    delay(250);
+  server.on("/maindoor", []() {
+
+    digitalWrite(alarmPin, HIGH);
+    delay(1000);
+    digitalWrite(alarmPin, LOW);
+    alarmVar = 0;
+    while(alarmVar < 3){
+      // play alarm
+      alarmVar++;
+      digitalWrite(alarmPin, HIGH);
+      delay(500);
+      digitalWrite(alarmPin, LOW);
+      delay(500);
+    }
+    alarmVar = 0;
+    while(alarmVar < 6){
+      // play alarm
+      alarmVar++;
+      digitalWrite(alarmPin, HIGH);
+      delay(100);
+      digitalWrite(alarmPin, LOW);
+      delay(100);
+    }    
+     
+    //the code to actually open the door 
     digitalWrite(relayPin, LOW);
+    delay(250);
+    digitalWrite(relayPin, HIGH);
     delay(50); //may not be needed
-    server.send(200, "text/plain", "door");
+    server.send(200, "text/plain", "maindoor");
+  });
+  
+  server.on("/smalldoor", []() {
+
+    digitalWrite(alarmPin, HIGH);
+    delay(1000);
+    digitalWrite(alarmPin, LOW);
+    alarmVar = 0;
+    while(alarmVar < 3){
+      // play alarm
+      alarmVar++;
+      digitalWrite(alarmPin, HIGH);
+      delay(500);
+      digitalWrite(alarmPin, LOW);
+      delay(500);
+    }
+    alarmVar = 0;
+    while(alarmVar < 6){
+      // play alarm
+      alarmVar++;
+      digitalWrite(alarmPin, HIGH);
+      delay(100);
+      digitalWrite(alarmPin, LOW);
+      delay(100);
+    }    
+     
+    //the code to actually open the door 
+    digitalWrite(relayPin2, LOW);
+    delay(250);
+    digitalWrite(relayPin2, HIGH);
+    delay(50); //may not be needed
+    server.send(200, "text/plain", "smalldoor");
   });
 
   server.on("/lightOn", []() {
-    digitalWrite(LED_BUILTIN, LOW);
+    digitalWrite(lightPin, HIGH);
     server.send(200, "text/plain", "lightOn");
   });
 
   server.on("/lightOff", []() {
-    digitalWrite(LED_BUILTIN, HIGH);
+    digitalWrite(lightPin, LOW);
     server.send(200, "text/plain", "lightOff");
   });
 
@@ -95,6 +158,18 @@ void setup(void) {
 }
 
 void loop() {
+  
+  // NOTIFICATION LIGHT
+  if (millis()%30000==0) { // every 30 seconds
+    digitalWrite(notificationPin1, HIGH);
+    delay(250);
+    digitalWrite(notificationPin1, LOW);
+    delay(200);
+    digitalWrite(notificationPin1, HIGH);
+    delay(250);
+    digitalWrite(notificationPin1, LOW);
+  }
+  
   server.handleClient();
   MDNS.update();
 }
