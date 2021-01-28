@@ -58,7 +58,7 @@ void setup(void) {
   WiFi.mode(WIFI_STA);
   WiFi.begin(ssid, password);
   Serial.println("");
-  init alarmVar = 0;  //Initialize the alarmVar variable for the alarm loop
+  int alarmVar = 0;  //Initialize the alarmVar variable for the alarm loop
 
   // Wait for connection
   while (WiFi.status() != WL_CONNECTED) {
