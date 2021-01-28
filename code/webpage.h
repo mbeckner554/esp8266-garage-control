@@ -11,7 +11,13 @@ R"(
     <div class="container-fluid">
       <div class="row" style="height: 33.33%; padding-top: 1em; padding-bottom:1em">
         <div class="col-xs-12" style="text-align: center; height: 100%">
-          <button id="drive" type="button" class="btn btn-default" style="height: 100%; width: 100%" onmousedown='makeAjaxCall("door")' >DOOR</button>
+          <button id="drive1" type="button" class="btn btn-default" style="height: 100%; width: 100%" onmousedown='makeAjaxCall("maindoor")' >MAIN DOOR</button>
+        </div>
+      </div>
+    <div class="container-fluid">
+      <div class="row" style="height: 33.33%; padding-top: 1em; padding-bottom:1em">
+        <div class="col-xs-12" style="text-align: center; height: 100%">
+          <button id="drive2" type="button" class="btn btn-default" style="height: 100%; width: 100%" onmousedown='makeAjaxCall("smalldoor")' >SMALL DOOR</button>
         </div>
       </div>
       <div class="row" style="height: 33.33%; padding-bottom:1em">
